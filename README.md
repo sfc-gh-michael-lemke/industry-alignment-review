@@ -1,53 +1,47 @@
 # Industry Alignment Review
 
-> Monthly RevOps audit of account industry classifications — flags mismatches, missing approvals, and AI vs. SFDC divergences.
+> Monthly audit of SFDC vs AI-suggested vs Final industry classifications — flags gaps and generates correction recommendations.
 
 A [Cortex Code Desktop](https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code) skill for Michael Lemke's RevOps workflows at Snowflake.
 
 ## What It Does
 
-Monthly CoCo workflow that analyzes account industry/subindustry classification data, flags accounts where SFDC, AI-suggested, and Final classifications disagree, identifies Final classifications set without Industry Leader approval, and generates a structured 5-section report with recommended corrections using Snowflake's 56-subindustry taxonomy.
+The skill pulls the current state of industry classifications for all accounts, compares the SFDC-recorded industry, the AI-suggested industry, and the Final approved industry, then flags approval gaps (Final set without Industry Leader sign-off) and mismatches (SFDC and AI disagree). It generates a 5-section report with a summary of total accounts reviewed, flagged accounts, recommended corrections, and the accounts requiring Industry Leader action.
 
 ## Business Value
 
 | Metric | Impact |
 |--------|--------|
-| Time saved | 3–4 hours/month → 20 minutes |
-| Data integrity | Catches misclassifications before quota attribution errors |
-| Approval tracking | Flags Final classifications missing Industry Leader sign-off |
+| Time saved | 2–4 hours/month |
+| Systems integrated | Salesforce, Snowflake account tables, Industry Leader roster |
+| Manual steps eliminated | Cross-referencing three classification columns, approval gap detection, correction drafting |
 
-Maintains the foundation of Snowflake's industry-based revenue attribution. A single misclassified account can shift quota targets between industry leaders.
+Maintains data integrity for Snowflake's industry-based revenue attribution and quota plans. Replaces a manual monthly audit spreadsheet exercise with a structured, repeatable, automated report.
 
-## Report Sections
+## How It Works
 
-1. **Approval gaps** — Finals set without Industry Leader sign-off
-2. **SFDC vs AI mismatches** — Where automated classification disagrees with SFDC entry
-3. **SFDC vs Final mismatches** — Where Final doesn't match current SFDC data
-4. **Recommended corrections** — AI-driven reclassification suggestions with confidence
-5. **Summary metrics** — Alignment % by industry vertical
+1. Skill queries Snowflake for all accounts with their SFDC industry, AI-suggested industry, and Final industry classification.
+2. Applies rule-based logic to flag: (a) accounts where Final ≠ SFDC or AI, (b) accounts where Final was set without an Industry Leader approval record, and (c) accounts where SFDC and AI disagree without a Final resolution.
+3. Groups flagged accounts by Industry Leader for easy routing.
+4. Uses LLM analysis to summarize patterns and draft recommended corrections.
+5. Outputs a 5-section markdown report covering: Summary, Approval Gaps, SFDC/AI Mismatches, Correction Recommendations, and Accounts Needing Action.
 
 ## Prerequisites
 
 - Cortex Code Desktop (CoCo)
-- Access to account classification data (MDM + SFDC tables)
-- Industry taxonomy knowledge (56 subindustries, 9 verticals)
+- Snowflake connection with read access to the account classification and Industry Leader tables
+- Role with visibility into SFDC sync tables in Snowflake
 
 ## Usage
 
-Invoke in CoCo:
-```
-industry-alignment-review
-```
-
-Triggers: "industry review", "industry alignment", "monthly industry audit", "classification review", "industry mismatch report"
+Invoke by typing the skill name in CoCo, or with natural language triggers listed in the skill description (e.g., "run industry alignment review", "monthly industry audit", "check industry classification gaps").
 
 ## Technologies
 
 - **Snowflake Cortex Code Desktop** — AI-powered IDE and skill runtime
-- **Snowflake SQL** — Account classification queries
-- **LLM analysis** — Classification recommendation engine
-- **56-node taxonomy** — Standardized industry/subindustry hierarchy
+- **Snowflake SQL** — multi-column classification comparison and approval gap queries
+- **LLM-powered analysis** — pattern detection, correction drafting, and report generation
 
 ## Value Realization
 
-This skill is part of a broader **AI-driven RevOps automation system**. Accurate industry classification is the foundation of Snowflake's quota plans, territory assignments, and industry-based pipeline reporting. Monthly automated reviews ensure data drifts are caught and corrected before they compound — protecting the integrity of revenue attribution across all 9 industry verticals.
+This skill is part of a broader **AI-driven RevOps automation system** that eliminates manual work across the Snowflake Sales Engineering and RevOps teams. Industry classification accuracy is directly tied to quota attribution and pipeline analytics — this skill ensures the monthly audit happens consistently, catches gaps before they distort reporting, and surfaces the right accounts to the right Industry Leaders for sign-off.
